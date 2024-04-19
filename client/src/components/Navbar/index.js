@@ -1,6 +1,8 @@
+import { Button } from '../Button';
+
 export default function Navbar() {
     return (
-        <nav>
+        <div className="top-bar">
             <ul className="navi-second">
                 <li>
                     <Button link="/register" title="Jetzt bei wwwe Legenden registrieren!">
@@ -13,14 +15,6 @@ export default function Navbar() {
                     </Button>
                 </li>
             </ul>
-        </nav>
-    );
-}
-
-export function Button({ children, link, title }) {
-    return (
-        <a className="btn" href={link} title={title}>
-            {children}
-        </a>
+        </div>
     );
 }

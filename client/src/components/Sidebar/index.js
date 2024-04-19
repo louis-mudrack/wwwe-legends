@@ -1,3 +1,5 @@
+import { Button } from '../Button';
+
 const pages = [
     { name: 'Startseite', path: '/', type: 'navigation' },
     { name: 'Turniere', path: '/turniere', type: 'navigation' },
@@ -15,37 +17,66 @@ const pages = [
 
 export default function Sidebar() {
     return (
-        <aside className="">
-            <ul className="navi-main">
-              <li><span>Navigation</span></li>
-                {pages
-                    .filter((page) => page.type === 'navigation')
-                    .map((page) => (
-                        <NavItem key={page.name} page={page}>
-                            <a href={page.path}>{page.name}</a>
-                        </NavItem>
-                    ))}
-                <li><span>Tournaments</span></li>
-                {pages
-                    .filter((page) => page.type === 'tournaments')
-                    .map((page) => (
-                        <NavItem key={page.name} page={page}>
-                            <a href={page.path}>{page.name}</a>
-                        </NavItem>
-                    ))}
-                <li><span>Mehr</span></li>
-                {pages
-                    .filter((page) => page.type === 'mehr')
-                    .map((page) => (
-                        <NavItem key={page.name} page={page}>
-                            <a href={page.path}>{page.name}</a>
-                        </NavItem>
-                    ))}
-            </ul>
-        </aside>
+        <nav className="">
+            <NavList />
+            <Button link="/apply-for-next-tournament" title="Jetzt für das nächste wwwe Legends anmelden!">
+                Anmeldung
+            </Button>
+            <LegalLinks />
+        </nav>
+    );
+}
+
+export function NavList() {
+    return (
+        <ul className="navi-main">
+            <li>
+                <span>Navigation</span>
+            </li>
+            {pages
+                .filter((page) => page.type === 'navigation')
+                .map((page) => (
+                    <NavItem key={page.name} page={page}>
+                        <a href={page.path}>{page.name}</a>
+                    </NavItem>
+                ))}
+            <li>
+                <span>Tournaments</span>
+            </li>
+            {pages
+                .filter((page) => page.type === 'tournaments')
+                .map((page) => (
+                    <NavItem key={page.name} page={page}>
+                        <a href={page.path}>{page.name}</a>
+                    </NavItem>
+                ))}
+            <li>
+                <span>Mehr</span>
+            </li>
+            {pages
+                .filter((page) => page.type === 'mehr')
+                .map((page) => (
+                    <NavItem key={page.name} page={page}>
+                        <a href={page.path}>{page.name}</a>
+                    </NavItem>
+                ))}
+        </ul>
     );
 }
 
 export function NavItem({ children, page }) {
     return <li className={page.name}>{children}</li>;
+}
+
+export function LegalLinks() {
+    return (
+        <ul className="navi-legal">
+            <NavItem key="Impressum" page={[{ name: 'Impressum' }]}>
+                <a href="/impressum">Impressum</a>
+            </NavItem>
+            <NavItem key="Datenschutz" page={[{ name: 'Datenschutz' }]}>
+                <a href="/datenschutz">Datenschutz</a>
+            </NavItem>
+        </ul>
+    );
 }
