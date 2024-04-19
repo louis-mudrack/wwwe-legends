@@ -25,7 +25,7 @@ export default function App() {
             .catch((error) => {
                 notificationRef.current.triggerNotification({
                     headline: 'Error:',
-                    body: 'Something went wrong!',
+                    body: 'Something went terribly wrong!',
                     timeout: 3000,
                 });
                 setIsLoading(false);
