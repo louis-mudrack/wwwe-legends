@@ -3,7 +3,7 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const { AppError, Notification } = require('../utils/notificationModule');
 const Email = require('../utils/email');
 
 const signToken = (id) => {
@@ -23,10 +23,6 @@ const createSendToken = (user, statusCode, req, res) => {
 
     res.cookie('jwt', token, cookieOptions);
     user.password = undefined;
-    res.status(200).json({
-        status: 'success',
-        message: 'Your password has been updated!',
-    });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
@@ -39,15 +35,10 @@ exports.signup = catchAsync(async (req, res, next) => {
         verificationCode,
     });
     const url = `${req.protocol}://${req.get('host')}/verify`;
-    // console.log(url);
     await new Email(newUser, url).sendWelcome();
 
     createSendToken(newUser, 201, req, res);
-    res.status(200).json({
-        status: 'success',
-        message: 'Your account has been created! Please verify your account using the code in the mail!',
-        redirect: '/verify',
-    });
+    new Notification(res, 200, 'Your account has been created! Please verify your account using the code in the mail!', '/verify');
 });
 
 exports.verify = catchAsync(async (req, res, next) => {
@@ -63,6 +54,7 @@ exports.verify = catchAsync(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     createSendToken(user, 201, req, res);
+    new Notification(res, 200, 'Your E-Mail has been verified!', '/dashboard');
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -79,6 +71,7 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     createSendToken(user, 200, req, res);
+    new Notification(res, 200, 'Logged in successfully!', '/dashboard');
 });
 
 exports.logout = (req, res) => {
@@ -86,7 +79,7 @@ exports.logout = (req, res) => {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true,
     });
-    res.status(200).redirect('/');
+    new Notification(res, 200, 'Logged out successfully!', '/');
 };
 
 exports.isLoggedIn = async (req, res, next) => {
@@ -95,13 +88,8 @@ exports.isLoggedIn = async (req, res, next) => {
             const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
 
             const currentUser = await User.findById(decoded.id);
-            if (!currentUser) {
-                return next();
-            }
-
-            if (currentUser.changedPasswordAfter(decoded.iat)) {
-                return next();
-            }
+            if (!currentUser) return next();
+            if (currentUser.changedPasswordAfter(decoded.iat)) return next();
 
             res.locals.user = currentUser;
             return next();
@@ -165,10 +153,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
         const resetURL = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
         await new Email(user, resetURL).sendPasswordReset();
 
-        res.status(200).json({
-            status: 'success',
-            message: 'Token sent to email!',
-        });
+        new Notification(res, 200, 'Token send to email!');
     } catch (err) {
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
@@ -196,6 +181,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     await user.save();
 
     createSendToken(user, 200, req, res);
+    new Notification(res, 200, 'Your password has been updated!', '/dashboard');
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -211,4 +197,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     await user.save();
 
     createSendToken(user, 200, req, res);
+    new Notification(res, 200, 'Your password has been updated!', '/dashboard');
 });
