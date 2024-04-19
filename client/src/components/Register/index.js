@@ -3,20 +3,40 @@ import NotificationContainer from '../Notification';
 
 export default function App() {
     const [isLoading, setIsLoading] = useState(false);
+    const [values, setValues] = useState({
+        username: "",
+        password: "",
+        passwordConfirm: "",
+        email: ""
+      });
     const notificationRef = useRef();
+
+    const handleInputChange = (event) => {
+        /* event.persist(); NO LONGER USED IN v.17*/
+        event.preventDefault();
+    
+        const { name, value } = event.target;
+        setValues((values) => ({
+          ...values,
+          [name]: value
+        }));
+      };
 
     const handleSubmit = (event) => {
         event.preventDefault();
         setIsLoading(true);
 
-        const form = event.target;
-        const body = new FormData(form);
         const fetchParams = {
             method: 'POST',
-            body: body,
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify(values),
         };
 
-        fetch(form.action, fetchParams)
+        console.log(event.target.action, fetchParams);
+
+        fetch(event.target.action, fetchParams)
             .then((response) => response.json())
             .then((body) => {
                 handleResponse(body);
@@ -96,10 +116,10 @@ export default function App() {
         <div>
             <NotificationContainer ref={notificationRef} />
             <form onSubmit={handleSubmit} action="/api/user/signup">
-                <input type="text" placeholder="Username" name="username" />
-                <input type="password" placeholder="Password" name="password" />
-                <input type="password" placeholder="Confirm Password" name="passwordConfirm" />
-                <input type="text" placeholder="Email" name="email" />
+                <input type="text" placeholder="Username" name="username" onChange={handleInputChange} />
+                <input type="password" placeholder="Password" name="password" onChange={handleInputChange} />
+                <input type="password" placeholder="Confirm Password" name="passwordConfirm" onChange={handleInputChange} />
+                <input type="text" placeholder="Email" name="email" onChange={handleInputChange} />
                 <button type="submit" disabled={isLoading}>
                     {isLoading ? 'Registering...' : 'Register'}
                 </button>
