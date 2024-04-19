@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useContext } from 'react';
+import { NotificationContext } from '../../NotificationContext';
 
-export default function useForm(initialValues, submitAction) {
+export default function useForm(initialValues, submitAction, selectedFile) {
     const [isLoading, setIsLoading] = useState(false);
+    const { setNotification } = useContext(NotificationContext); 
     const [values, setValues] = useState(initialValues);
-    const notificationRef = useRef();
 
     const handleInputChange = (event) => {
         event.preventDefault();
@@ -19,18 +20,24 @@ export default function useForm(initialValues, submitAction) {
         setIsLoading(true);
 
         const method = event.target.dataset.method ? event.target.dataset.method : event.target.method;
-        const body = event.target.querySelector('input[type="file"]') ? new FormData(event.target) : JSON.stringify(values);
+        const isFileUpload = event.target.querySelector('input[type="file"]');
+        let body;
+
+        if (isFileUpload) {
+            body = new FormData(event.target);
+            if (selectedFile) {
+                body.append('photo', selectedFile);
+            }
+        } else {
+            body = JSON.stringify(values);
+        }
 
         let fetchParams = {
             method: method,
             body: body,
         };
 
-        if (method === 'GET') {
-            fetchParams = {
-                method: method,
-            };
-        } else {
+        if (!isFileUpload) {
             fetchParams.headers = {
                 'Content-type': 'application/json',
             };
@@ -43,9 +50,9 @@ export default function useForm(initialValues, submitAction) {
                 setIsLoading(false);
             })
             .catch((error) => {
-                notificationRef.current.triggerNotification({
+                setNotification({
                     headline: 'Error:',
-                    body: 'Something went terribly wrong!',
+                    body: 'Etwas ist schief gelaufen!',
                     timeout: 3000,
                 });
                 setIsLoading(false);
@@ -55,8 +62,8 @@ export default function useForm(initialValues, submitAction) {
     const handleResponse = (body) => {
         switch (body.status) {
             case 'fail':
-                notificationRef.current.triggerNotification({
-                    headline: 'Failed',
+                setNotification({
+                    headline: 'Fehlgeschlagen:',
                     body: body.message,
                     timeout: 3000,
                 });
@@ -65,8 +72,8 @@ export default function useForm(initialValues, submitAction) {
                 handleErrors(body);
                 break;
             case 'warning':
-                notificationRef.current.triggerNotification({
-                    headline: 'Warning',
+                setNotification({
+                    headline: 'Warnung:',
                     body: body.message,
                     timeout: 3000,
                 });
@@ -75,9 +82,9 @@ export default function useForm(initialValues, submitAction) {
                 handleSuccess(body);
                 break;
             default:
-                notificationRef.current.triggerNotification({
+                setNotification({
                     headline: 'Error:',
-                    body: 'Something went wrong!',
+                    body: 'Etwas ist schief gelaufen!',
                     timeout: 3000,
                 });
         }
@@ -90,9 +97,9 @@ export default function useForm(initialValues, submitAction) {
                 errorMessage += `<b>${error}</b>: ${body.error.errors[error].message} <br />`;
             }
         } else {
-            errorMessage = body.message ? body.message : 'Something happened and I have no idea what to do :/';
+            errorMessage = body.message ? body.message : 'Etwas ist schief gelaufen und ich kanns nicht fixen :(';
         }
-        notificationRef.current.triggerNotification({
+        setNotification({
             headline: 'Error',
             body: errorMessage,
             timeout: 3000,
@@ -100,17 +107,17 @@ export default function useForm(initialValues, submitAction) {
     };
 
     const handleSuccess = (body) => {
-        notificationRef.current.triggerNotification({
-            headline: 'Success',
+        setNotification({
+            headline: 'Erfolg:',
             body: body.message,
             timeout: 3000,
         });
         if (body.redirect) {
             setTimeout(() => {
                 window.location.href = body.redirect;
-            }, 1000);
+            }, 5000);
         }
     };
 
-    return { values, isLoading, notificationRef, handleInputChange, handleSubmit };
+    return { values, isLoading, handleInputChange, handleSubmit };
 }

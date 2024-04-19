@@ -5,7 +5,7 @@ export default function Navbar() {
         <div className="top-bar">
             <ul className="navi-second">
                 <li>
-                    <Button link="/register" title="Jetzt bei wwwe Legenden registrieren!">
+                    <Button link="/registrieren" title="Jetzt bei wwwe Legenden registrieren!">
                         Registrieren
                     </Button>
                 </li>

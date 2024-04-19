@@ -34,11 +34,11 @@ exports.signup = catchAsync(async (req, res, next) => {
         passwordConfirm: req.body.passwordConfirm,
         verificationCode,
     });
-    const url = `${req.protocol}://${req.get('host')}/verify`;
+    const url = `${req.protocol}://${req.get('host')}/verifizierung`;
     await new Email(newUser, url).sendWelcome();
 
     createSendToken(newUser, 201, req, res);
-    new Notification(res, 200, 'Your account has been created! Please verify your account using the code in the mail!', '/verify');
+    new Notification(res, 200, 'Your account has been created! Please verify your account using the code in the mail!', '/verifizierung');
 });
 
 exports.verify = catchAsync(async (req, res, next) => {
@@ -185,7 +185,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-    console.log(req.body);
     const user = await User.findById(req.user.id, 'password');
 
     if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
