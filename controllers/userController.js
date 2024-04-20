@@ -3,7 +3,7 @@ const fs = require('fs');
 const sharp = require('sharp');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const { AppError, Notification } = require('../utils/notificationModule');
 const factory = require('./handlerFactory');
 
 const multerStorage = multer.memoryStorage();
@@ -23,7 +23,7 @@ const upload = multer({
 
 exports.deleteOldPhoto = (req, res, next) => {
     if (req.file && req.user.photo != 'default.jpg') {
-        fs.unlinkSync(`public/img/users/${req.user.photo}`, new AppError('Cant get old Image.', 400));
+        fs.unlinkSync(`client/public/img/users/${req.user.photo}`, new AppError('Cant get old Image.', 400));
     }
     next();
 };
@@ -39,7 +39,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
         .resize(500, 500)
         .toFormat('jpeg')
         .jpeg({ quality: 90 })
-        .toFile(`public/img/users/${req.file.filename}`);
+        .toFile(`client/public/img/users/${req.file.filename}`);
 
     next();
 });
@@ -73,6 +73,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
         runValidators: true,
     });
 
+    new Notification(res, 200, 'Your account has been updated successfully!');
+
     res.status(200).json({
         status: 'success',
         message: 'Updated User successfully',
@@ -84,6 +86,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
     await User.findByIdAndUpdate(req.user.id, { active: false });
+
+    new Notification(res, 200, 'Your account has been deleted successfully!', '/');
 
     res.status(204).json({
         status: 'success',

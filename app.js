@@ -6,7 +6,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
-const AppError = require('./utils/appError');
+const { AppError } = require('./utils/notificationModule');
 const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 
@@ -24,9 +24,6 @@ app.options('*', cors());
 // Serving static files
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.all('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-});
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
@@ -55,6 +52,9 @@ app.use((req, res, next) => {
 // router
 app.use('/api/user', userRouter);
 
+app.all('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+});
 // In your Express server setup  
 
 app.all('*', (req, res, next) => {

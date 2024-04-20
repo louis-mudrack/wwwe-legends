@@ -2,5 +2,5 @@
 node_modules/
 .parcel-cache/
 .env
-public/img/users/*
-!/public/img/users/default.jpg
+client/public/img/users/*
+!/client/public/img/users/default.jpg

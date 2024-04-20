@@ -1,0 +1,71 @@
+/* Popup Styles */
+#notification-container {
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  bottom: 16px;
+  left: 16px;
+}
+
+.notification {
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border: 4px solid rgba(0, 0, 0, 1);
+  text-align: left;
+  max-width: 300px;
+  min-width: 100px;
+  height: fit-content;
+  animation: .3s fade-in forwards;
+  margin-bottom: 8px;
+}
+
+.notification.fade-out {
+  animation: .3s fade-out forwards;
+}
+
+.notification .headline {
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 1);
+}
+
+.notification .body {
+  margin: 0;
+  color: rgba(0, 0, 0, 1);
+}
+
+.notification .notification-close::before {
+  content: "x";
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  font-size: 18px;
+  color: #fff;
+  background-color: #000;
+  
+}
+
+@keyframes fade-in {
+  0% {
+      transform: translateX(-16px);
+      opacity: 0;
+  }
+  100% {
+      transform: translateX(0px);
+      opacity: 1;
+  }
+}
+@keyframes fade-out { 
+  0% {
+      transform: translateX(0px);
+      opacity: 1;
+  }
+  100% {
+      transform: translateX(-16px);
+      opacity: 0;
+  }
+}
