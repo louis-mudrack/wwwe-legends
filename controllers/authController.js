@@ -38,7 +38,12 @@ exports.signup = catchAsync(async (req, res, next) => {
     await new Email(newUser, url).sendWelcome();
 
     createSendToken(newUser, 201, req, res);
-    new Notification(res, 200, 'Your account has been created! Please verify your account using the code in the mail!', '/verifizierung');
+    new Notification(
+        res,
+        200,
+        'Your account has been created! Please verify your account using the code in the mail!',
+        '/verifizierung'
+    );
 });
 
 exports.verify = catchAsync(async (req, res, next) => {
@@ -79,7 +84,7 @@ exports.logout = (req, res) => {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true,
     });
-    new Notification(res, 200, 'Logged out successfully!', '/');
+    res.redirect('/');
 };
 
 exports.isLoggedIn = async (req, res, next) => {

@@ -115,7 +115,7 @@ export default function useForm(initialValues, submitAction, selectedFile) {
         if (body.redirect) {
             setTimeout(() => {
                 window.location.href = body.redirect;
-            }, 5000);
+            }, 3000);
         }
     };
 
