@@ -8,6 +8,8 @@ import Login from './components/Login';
 import Verification from './components/Verification';
 import ForgotPassword from './components/ForgotPassword';
 import Dashboard from './components/Dashboard';
+import CreateTournament from './components/CreateTournament';
+import JoinTournament from './components/JoinTournament';
 import './App.css';
 import NotificationContainer from './components/Notification';
 
@@ -36,6 +38,8 @@ export default function App() {
                         <Route path="/verifizierung" element={<Verification />} />
                         <Route path="/passwort-vergessen" element={<ForgotPassword />} />
                         <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/turnier-erstellen" element={<CreateTournament />} />
+                        <Route path="/turnier/:name" element={<JoinTournament />} />
                     </Routes>
                 </Router>
             </UserContext.Provider>

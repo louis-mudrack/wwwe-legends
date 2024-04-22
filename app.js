@@ -9,6 +9,7 @@ const cors = require('cors');
 const { AppError } = require('./utils/notificationModule');
 const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
+const tournamentRouter = require('./routes/tournamentRoutes');
 
 const app = express();
 
@@ -37,6 +38,7 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again in an hour!',
 });
 app.use('/api/user', limiter);
+app.use('/api/tournament', limiter);
 
 // Configure Middleware
 app.use(express.json({ limit: '10kb' }));
@@ -51,6 +53,7 @@ app.use((req, res, next) => {
 
 // router
 app.use('/api/user', userRouter);
+app.use('/api/tournament', tournamentRouter);
 
 app.all('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));

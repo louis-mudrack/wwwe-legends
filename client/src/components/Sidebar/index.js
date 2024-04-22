@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Button } from '../Button';
 
 const pages = [
@@ -6,9 +7,6 @@ const pages = [
     { name: 'Statistiken', path: '/statistiken', type: 'navigation' },
     { name: 'Offizielle Regeln', path: '/offizielle-regeln', type: 'navigation' },
     { name: 'Punktesystem', path: '/punktesystem', type: 'navigation' },
-    { name: 'Apex Legenden 08.05.2024', path: '/apex-legenden-08-05-2024', type: 'tournaments' },
-    { name: 'Apex Legenden 12.04.2024', path: '/apex-legenden-12-04-2024', type: 'tournaments' },
-    { name: 'Apex Legenden 27.12.2023', path: '/apex-legenden-27-12-2023', type: 'tournaments' },
     { name: 'Discord', path: 'https://discord.gg/YhM7ffMt8D', type: 'mehr' },
     { name: 'YouTube', path: 'https://www.youtube.com/@this_is_wwwe', type: 'mehr' },
     { name: 'Instagram', path: 'https://www.instagram.com/wwwe.creative/', type: 'mehr' },
@@ -19,7 +17,7 @@ export default function Sidebar() {
     return (
         <nav className="">
             <NavList />
-            <Button link="/apply-for-next-tournament" title="Jetzt für das nächste wwwe Legends anmelden!">
+            <Button link="/turnier/uebersicht" title="Jetzt für das nächste wwwe Legends anmelden!">
                 Anmeldung
             </Button>
             <LegalLinks />
@@ -28,6 +26,17 @@ export default function Sidebar() {
 }
 
 export function NavList() {
+    const [tournaments, setTournaments] = useState([]);
+
+    useEffect(() => {
+        fetch('/api/tournament/')
+            .then((response) => response.json())
+            .then((data) => {
+                setTournaments(data.data.data);
+            })
+            .catch((error) => console.error(error));
+    }, []);
+
     return (
         <ul className="navi-main">
             <li>
@@ -43,13 +52,11 @@ export function NavList() {
             <li>
                 <span>Tournaments</span>
             </li>
-            {pages
-                .filter((page) => page.type === 'tournaments')
-                .map((page) => (
-                    <NavItem key={page.name} page={page}>
-                        <a href={page.path}>{page.name}</a>
-                    </NavItem>
-                ))}
+            {tournaments.map((tournament) => (
+                <NavItem key={tournament.name} page={tournament}>
+                    <a href={`/turnier/${tournament.name}`}>{tournament.name}</a>
+                </NavItem>
+            ))}
             <li>
                 <span>Mehr</span>
             </li>
